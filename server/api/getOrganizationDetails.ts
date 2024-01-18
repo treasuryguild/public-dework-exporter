@@ -31,7 +31,7 @@ function transformWorkspaces(workspaces: any, organizationName: any) {
 
 export default defineEventHandler(async (event: any) => {
   const body = await readBody(event)
-  const organizationId = body.workspace; 
+  const organizationId = body.organizationId; 
   
     const query = `
       query GetOrganizationDetailsQuery {
@@ -56,7 +56,6 @@ export default defineEventHandler(async (event: any) => {
     try {
       const response = await axios.post('https://api.deworkxyz.com/graphql?op=GetOrganizationDetailsQuery', {
         query,
-        variables,
       }, {
         headers,
       });
