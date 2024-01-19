@@ -53,15 +53,25 @@ async function getDeworkData(id : string) {
   return response.data;
 }
 
+async function processBatch(batch: any) {
+  return await Promise.all(batch.map(async (key: any) => {
+    const tasks = await getDeworkData(snet.value[key].id);
+    return { key, tasks: tasks.data.getWorkspace.tasks };
+  }));
+}
+
 async function getsnetWorkspaces() {
   if (isCancelled.value) return;
-  
-  const tasksPromises = Object.keys(snet.value).map(async key => {
-    const tasks = await getDeworkData(snet.value[key].id);
-return { key, tasks: tasks.data.getWorkspace.tasks };
-  });
 
-  const results = await Promise.all(tasksPromises);
+  const allKeys = Object.keys(snet.value);
+  const results = [];
+
+  for (let i = 0; i < allKeys.length; i += 6) {
+    const batch = allKeys.slice(i, i + 6);
+    const batchResults = await processBatch(batch);
+    results.push(...batchResults);
+  }
+
   results.forEach(({ key, tasks }) => {
     snet.value[key].tasks = tasks;
   });
