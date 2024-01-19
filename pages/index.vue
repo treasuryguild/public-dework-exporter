@@ -66,9 +66,9 @@ async function processWorkspaces(workspaceObj: any, workspaceLabel: string) {
   const allKeys = Object.keys(workspaceObj);
   const results = [];
 
-  for (let i = 0; i < allKeys.length; i += 6) {
+  for (let i = 0; i < allKeys.length; i += 20) {
     console.log(`Running ${workspaceLabel}`);
-    const batch = allKeys.slice(i, i + 6);
+    const batch = allKeys.slice(i, i + 20);
     const batchResults = await processBatch(batch, workspaceObj, getDeworkData);
     results.push(...batchResults);
   }
