@@ -10,6 +10,7 @@
   let swarm: any = ref({});
   const isDataLoaded = ref(false);
     
+  async function getOrgDetails() {
     try {
       const promises = [
         axios.post(`/api/getOrganizationDetails`, { organizationId: orgSNET }),
@@ -22,11 +23,13 @@
     } catch (error) {
       console.error('Error fetching tasks:', error);
     }
-
+  }
+    
   let snetSlug = ref();
   let swarmSlug = ref()
 
   onMounted(async () => {
+    await getOrgDetails();
     await getDework();
   });
 
@@ -87,16 +90,16 @@ async function getWorkspaceSlug(id: string) {
 
 async function getDework() {
   loaded.value = false;
-  localStorage.removeItem("snetWorkspaces");
-  localStorage.removeItem("swarmWorkspaces");
+  //localStorage.removeItem("snetWorkspaces");
+  //localStorage.removeItem("swarmWorkspaces");
   const snetSlugs = await getWorkspaceSlug(orgSNET);
   const swarmSlugs = await getWorkspaceSlug(orgSwarm);
   snetSlug.value = snetSlugs.data.getOrganization;
   swarmSlug.value = swarmSlugs.data.getOrganization;
   updateObjectWithSlugs(snet.value, snetSlugs);
   updateObjectWithSlugs(swarm.value, swarmSlugs);
-  localStorage.setItem("snetWorkspaces", JSON.stringify(snet.value));
-  localStorage.setItem("swarmWorkspaces", JSON.stringify(swarm.value));
+  //localStorage.setItem("snetWorkspaces", JSON.stringify(snet.value));
+  //localStorage.setItem("swarmWorkspaces", JSON.stringify(swarm.value));
   await getTasks();
   loaded.value = true;
 }
@@ -262,7 +265,7 @@ async function exportData(id: any) {
 
 <template>
   <div class="main">
-    <div v-if="loaded">
+    <div v-if="isDataLoaded">
       <table>
         <thead>
           <tr>
