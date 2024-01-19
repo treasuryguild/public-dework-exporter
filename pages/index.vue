@@ -48,47 +48,42 @@ function updateObjectWithSlugs(object: any, slugs: any) {
   });
 }
 
-async function getDeworkData(id : string) {
+async function getDeworkData(id: string) {
   const response = await axios.post(`/api/getDeworkData`, { workspace: id });
   return response.data;
 }
 
-async function processBatch(batch: any) {
-  return await Promise.all(batch.map(async (key: any) => {
-    const tasks = await getDeworkData(snet.value[key].id);
+async function processBatch(batch: any[], workspaceObj: any, callback: (id: string) => Promise<any>) {
+  return await Promise.all(batch.map(async key => {
+    const tasks = await callback(workspaceObj[key].id);
     return { key, tasks: tasks.data.getWorkspace.tasks };
   }));
 }
 
-async function getsnetWorkspaces() {
+async function processWorkspaces(workspaceObj: any, workspaceLabel: string) {
   if (isCancelled.value) return;
 
-  const allKeys = Object.keys(snet.value);
+  const allKeys = Object.keys(workspaceObj);
   const results = [];
 
   for (let i = 0; i < allKeys.length; i += 6) {
+    console.log(`Running ${workspaceLabel}`);
     const batch = allKeys.slice(i, i + 6);
-    const batchResults = await processBatch(batch);
+    const batchResults = await processBatch(batch, workspaceObj, getDeworkData);
     results.push(...batchResults);
   }
 
   results.forEach(({ key, tasks }) => {
-    snet.value[key].tasks = tasks;
+    workspaceObj[key].tasks = tasks;
   });
 }
 
-async function getswarmWorkspaces() {
-  if (isCancelled.value) return;
-  
-  const tasksPromises = Object.keys(swarm.value).map(async key => {
-    const tasks = await getDeworkData(swarm.value[key].id);
-return { key, tasks: tasks.data.getWorkspace.tasks };
-  });
+async function getsnetWorkspaces() {
+  await processWorkspaces(snet.value, "Snet");
+}
 
-  const results = await Promise.all(tasksPromises);
-  results.forEach(({ key, tasks }) => {
-    swarm.value[key].tasks = tasks;
-  });
+async function getswarmWorkspaces() {
+  await processWorkspaces(swarm.value, "Swarm");
 }
 
 async function getWorkspaceSlug(id: string) {
@@ -114,7 +109,7 @@ async function getDework() {
 
 async function getTasks() {
   // Initiate both tasks simultaneously and wait for both to complete
-  await Promise.all([getsnetWorkspaces()]);
+  await Promise.all([getswarmWorkspaces(), getsnetWorkspaces()]);
 
   // Once both tasks are complete, update localStorage
   localStorage.setItem("snetWorkspaces", JSON.stringify(snet.value));
