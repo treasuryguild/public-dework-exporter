@@ -56,10 +56,9 @@ async function getDeworkData(id : string) {
 async function getsnetWorkspaces() {
   if (isCancelled.value) return;
   
-  const tasksPromises = Object.keys(snet.value).map(key => {
-    return getDeworkData(snet.value[key].id).then((tasks: any) => {
-      return { key, tasks: tasks.data.getWorkspace.tasks };
-    });
+  const tasksPromises = Object.keys(snet.value).map(async key => {
+    const tasks = await getDeworkData(snet.value[key].id);
+return { key, tasks: tasks.data.getWorkspace.tasks };
   });
 
   const results = await Promise.all(tasksPromises);
@@ -71,10 +70,9 @@ async function getsnetWorkspaces() {
 async function getswarmWorkspaces() {
   if (isCancelled.value) return;
   
-  const tasksPromises = Object.keys(swarm.value).map(key => {
-    return getDeworkData(swarm.value[key].id).then((tasks: any) => {
-      return { key, tasks: tasks.data.getWorkspace.tasks };
-    });
+  const tasksPromises = Object.keys(swarm.value).map(async key => {
+    const tasks = await getDeworkData(swarm.value[key].id);
+return { key, tasks: tasks.data.getWorkspace.tasks };
   });
 
   const results = await Promise.all(tasksPromises);
