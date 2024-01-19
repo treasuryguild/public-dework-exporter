@@ -88,23 +88,23 @@ async function getWorkspaceSlug(id: string) {
 
 async function getDework() {
   loaded.value = false;
-  //localStorage.removeItem("snetWorkspaces");
-  //localStorage.removeItem("swarmWorkspaces");
+  localStorage.removeItem("snetWorkspaces");
+  localStorage.removeItem("swarmWorkspaces");
   const snetSlugs = await getWorkspaceSlug(orgSNET);
   const swarmSlugs = await getWorkspaceSlug(orgSwarm);
   snetSlug.value = snetSlugs.data.getOrganization;
   swarmSlug.value = swarmSlugs.data.getOrganization;
   updateObjectWithSlugs(snet.value, snetSlugs);
   updateObjectWithSlugs(swarm.value, swarmSlugs);
-  //localStorage.setItem("snetWorkspaces", JSON.stringify(snet.value));
-  //localStorage.setItem("swarmWorkspaces", JSON.stringify(swarm.value));
+  localStorage.setItem("snetWorkspaces", JSON.stringify(snet.value));
+  localStorage.setItem("swarmWorkspaces", JSON.stringify(swarm.value));
   await getTasks();
   loaded.value = true;
 }
 
 async function getTasks() {
   // Initiate both tasks simultaneously and wait for both to complete
-  await Promise.all([getswarmWorkspaces(), getsnetWorkspaces()]);
+  await Promise.all([getsnetWorkspaces()]);
 
   // Once both tasks are complete, update localStorage
   localStorage.setItem("snetWorkspaces", JSON.stringify(snet.value));
