@@ -8,7 +8,7 @@ export default defineEventHandler(async (event: any) => {
   query GetWorkspaceTasksQuery {
     getWorkspace(id: "${workspace}") {
       id
-      tasks {
+      tasks(filter: { statuses: [IN_REVIEW] }) {
         id
         name
         assignees {
@@ -27,7 +27,6 @@ export default defineEventHandler(async (event: any) => {
         tags {
           id
           label
-          color
         }
         workspaceId
       }

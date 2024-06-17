@@ -14,7 +14,6 @@ export default defineEventHandler(async (event: any) => {
           tags {
             id
             label
-            color
           }
           workspaceId
         }
